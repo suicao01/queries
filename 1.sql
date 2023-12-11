@@ -10,8 +10,18 @@ group by c.customerNumber
 having (recency <= 5 and frequency >=5) or monetary >= 500000
 
 //cau 3
-select pl.productLine, pl.textDescription, (select sum(quantityInStock +(select sum(quantityOrdered)
-from orderdetails where productCode = p.productCode))
-from products p where p.productLine =pl.productLine) as totalProducts
-from productlines pl
-group by pl.productLine
+SELECT productLine, textDescription,  (totalInStock + totalOrdered) AS totalProducts
+FROM (
+    SELECT pl.productLine, pl.textDescription, 
+        (SELECT SUM(quantityInStock) AS totalInStock
+         FROM products p
+         WHERE p.productLine = pl.productLine) AS totalInStock,
+        (SELECT SUM(quantityOrdered)
+         FROM orderdetails
+         WHERE productCode IN (SELECT productCode
+                               FROM products
+                               WHERE productLine = pl.productLine)) AS totalOrdered
+    FROM productlines pl
+    GROUP BY pl.productLine
+) AS subquery
+
