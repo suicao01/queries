@@ -25,3 +25,11 @@ FROM (
     GROUP BY pl.productLine
 ) AS subquery
 
+//cau 4
+select c.customerName, (select sum(amount) from payments
+where customerNumber = c.customerNumber) as totalPaid, (select sum(quantityOrdered*priceEach)
+from orderdetails where orderNumber in (select orderNumber
+from orders where customerNumber = c.customerNumber)) as totalPurchase, (select (totalPurchase - totalPaid)) as debt
+from customers c
+group by c.customerNumber
+having totalPurchase <= 100000
