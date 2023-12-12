@@ -33,3 +33,11 @@ from orders where customerNumber = c.customerNumber)) as totalPurchase, (select 
 from customers c
 group by c.customerNumber
 having totalPurchase <= 100000
+
+//cau 6
+select pl.*, (select sum(buyPrice*quantityInStock) 
+from products where productLine = pl.productLine) as inventoryMoney
+from productlines pl
+group by pl.productLine
+
+
